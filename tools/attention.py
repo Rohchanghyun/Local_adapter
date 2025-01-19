@@ -187,9 +187,6 @@ def visualize_attention_maps(attention, save_path, title, data=None, batch_idx=N
         
         # 모든 keypoint의 attention 합 계산 및 시각화
         all_keypoints_attn = keypoint_attns.mean(0).reshape(feature_h, feature_w)  # [32, 24]
-        all_keypoints_attn_map = cv2.resize(all_keypoints_attn.cpu().numpy(),
-                                          (img_width, img_height),
-                                          interpolation=cv2.INTER_LINEAR)
         
         plt.figure(figsize=(10, 10))
         plt.subplot(1, 2, 1)
@@ -198,21 +195,19 @@ def visualize_attention_maps(attention, save_path, title, data=None, batch_idx=N
         plt.axis('off')
         
         plt.subplot(1, 2, 2)
-        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-        plt.imshow(all_keypoints_attn_map, alpha=0.5, cmap='jet')
-        plt.title(f"All Keypoints Combined Attention")
+        # resize 없이 직접 32x24 attention map 표시
+        plt.imshow(all_keypoints_attn.cpu().numpy(), cmap='jet')
+        plt.title(f"All Keypoints Combined Attention (32x24)")
         plt.colorbar()
         plt.axis('off')
         
         plt.savefig(os.path.join(layer_save_dir, "all_keypoints_attention.png"))
         plt.close()
         
-        # 각 keypoint에 대한 attention map 시각화 (기존 코드)
+        # 수정된 시각화 부분
         for kpt_idx in range(num_keypoints):
+            # attention map을 32x24 크기로 직접 시각화
             patch_attn = keypoint_attns[kpt_idx].reshape(feature_h, feature_w)
-            attn_map = cv2.resize(patch_attn.cpu().numpy(), 
-                                (img_width, img_height), 
-                                interpolation=cv2.INTER_LINEAR)
             
             plt.figure(figsize=(10, 10))
             plt.subplot(1, 2, 1)
@@ -221,13 +216,13 @@ def visualize_attention_maps(attention, save_path, title, data=None, batch_idx=N
             plt.axis('off')
             
             plt.subplot(1, 2, 2)
-            plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-            plt.imshow(attn_map, alpha=0.5, cmap='jet')
-            plt.title(f"Keypoint {kpt_idx} Attention")
+            # resize 없이 직접 32x24 attention map 표시
+            plt.imshow(patch_attn.cpu().numpy(), cmap='jet')
+            plt.title(f"Keypoint {kpt_idx} Attention (32x24)")
             plt.colorbar()
             plt.axis('off')
             
-            plt.savefig(os.path.join(layer_save_dir, f"keypoint_{kpt_idx}_attention.png"))
+            plt.savefig(os.path.join(layer_save_dir, f"keypoint_{kpt_idx}_attention_original_size.png"))
             plt.close()
 
         # 원본 이미지와 keypoint 시각화 (기존 코드)
