@@ -135,7 +135,6 @@ attention_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='TopDownGetBboxCenterScale', padding=1.25),
     dict(type='TopDownAffine'),
-    dict(type='TopDownGenerateTarget', sigma=2, unbiased_encoding=True),
     dict(type='ToTensor'),
     dict(
         type='NormalizeTensor',
@@ -143,10 +142,10 @@ attention_pipeline = [
         std=[0.229, 0.224, 0.225]),
     dict(
         type='Collect',
-        keys=['img', 'target', 'target_weight'],
+        keys=['img'],
         meta_keys=[
-            'image_file', 'joints_3d', 'joints_3d_visible', 'center', 'scale',
-            'rotation', 'bbox_score', 'flip_pairs'
+            'image_file', 'center', 'scale', 'rotation', 'bbox_score',
+            'flip_pairs'
         ]),
 ]
 
@@ -179,8 +178,8 @@ data = dict(
         dataset_info={{_base_.dataset_info}}),
     attention=dict(
         type='TopDownCocoDataset',
-        ann_file=f'{data_root}/annotations/person_keypoints_train2017.json',
-        img_prefix=f'{data_root}/custom_images/',
+        ann_file='/workspace/data/changhyun/dataset/test/sticker/dummy_annotations.json',
+        img_prefix='/workspace/data/changhyun/dataset/test/sticker/',
         data_cfg=data_cfg,
         pipeline=attention_pipeline,
         dataset_info={{_base_.dataset_info}}),
